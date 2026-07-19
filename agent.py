@@ -131,6 +131,7 @@ def create_github_client() -> Github:
 
 def get_repository(github_client: Github):
     repository_url = build_repo_url()
+    print(repository_url)
     return github_client.get_repo(get_full_repository_name(repository_url))
 
 
