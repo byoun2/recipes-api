@@ -335,7 +335,6 @@ repo_url = build_repo_url()
 async def main() -> None:
     dotenv.load_dotenv()
     pr_number = int(get_required_env_variable("PR_NUMBER"))
-
     llm = create_llm()
     github_client = create_github_client()
     try:
@@ -346,6 +345,10 @@ async def main() -> None:
         workflow = create_workflow(context_agent, commentor_agent, review_posting_agent)
         query = f"Write a review for PR number {pr_number}"
         await stream_agent_response(workflow, query)
+    except Exception:
+        import traceback
+        traceback.print_exc()
+        raise
     finally:
         github_client.close()
 
