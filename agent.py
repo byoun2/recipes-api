@@ -230,8 +230,8 @@ def create_commentor_tools() -> list:
 def create_llm() -> OpenAI:
     return OpenAI(
         model=os.getenv("OPENAI_MODEL", default=DEFAULT_OPENAI_MODEL),
-        api_key=os.getenv("OPENAI_API_KEY"),
-        api_base=os.getenv("OPENAI_BASE_URL"),
+        api_key=get_required_env_variable("OPENAI_API_KEY"),
+        api_base=os.getenv("OPENAI_BASE_URL") or None,
     )
 
 
@@ -334,8 +334,20 @@ repo_url = build_repo_url()
 
 async def main() -> None:
     dotenv.load_dotenv()
+    print("Starting review agent...", flush=True)
+    print(f"REPOSITORY is set: {bool(os.getenv('REPOSITORY'))}", flush=True)
+    print(f"PR_NUMBER is set: {bool(os.getenv('PR_NUMBER'))}", flush=True)
+    print(f"GITHUB_TOKEN is set: {bool(os.getenv(GITHUB_TOKEN_ENV))}", flush=True)
+    print(f"OPENAI_API_KEY is set: {bool(os.getenv('OPENAI_API_KEY'))}", flush=True)
+    print(f"OPENAI_BASE_URL is set: {bool(os.getenv('OPENAI_BASE_URL'))}", flush=True)
+
     pr_number = int(get_required_env_variable("PR_NUMBER"))
     llm = create_llm()
+
+    print("Testing LLM connection...", flush=True)
+    test_response = llm.complete("Reply with only: ok")
+    print(f"LLM test response: {test_response}", flush=True)
+
     github_client = create_github_client()
     try:
         repository = get_repository(github_client)
